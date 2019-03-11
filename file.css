@@ -1,0 +1,47 @@
+b {
+  font-size: 16px;
+}
+
+span {
+  font-size: 16px;
+}
+
+a {
+  color: #D5D8DC;
+}
+
+body {
+  background-color: #626567; /* Dark Blue */
+  color: #EAECEE;
+}
+
+.new-section {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.new-division {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.new-boundary {
+  padding-top: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.divLast {
+  padding-top: 10px;
+  border-width: 2px;
+  border-bottom: 2px white solid;
+  width: 100%;
+}
+
+.extra-space {
+  padding-top: 100px;
+}
+    
+.big {
+  font-size: 20px;
+}

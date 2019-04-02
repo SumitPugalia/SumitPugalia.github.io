@@ -1,0 +1,4 @@
+Add {:distillery, "~> 2.0", runtime: false} in mix.exs
+mix deps.get
+mix release.init (This command creates a configuration file rel/config.exs. You could also manually create the file but it’s more convenient like this.)
+mix release

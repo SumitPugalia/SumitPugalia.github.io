@@ -1,0 +1,159 @@
+
+BASIC DOCKER COMMANDS
+```Docker is made up of various layers```
+
+Docker Pull Command is used to pull any image to our local system
+
+	docker pull <owner> <image>:<tag> 
+		Example:
+		docker pull mysql/mysql-server (Here the Owner is mysql and tag is latest)
+		docker pull ubuntu:latest (Here the Owner is dockerhub which is default)
+
+Docker Run Command is used to run and create the container containing the image mentioned
+	
+	docker run <options> <image> <command>
+		Example:
+		docker run -it ubuntu:latest /bin/bash (Here the command is bash shell so the container runs until the command runs)
+
+	ctrl + p + q -> Exit out of the container and container is still running
+
+Docker container command is used to operate on the container created
+	
+	docker container <option>
+		Example: 
+		docker container ls (to list all the active containers)
+		docker container ls -a (to list all the containers)
+		docker container exec -it <container-name-id> /bin/bash (to connect the container)
+		docker stop <container-name-id> (to stop the container)
+		docker start <container-name-id> (to start the container that was stopped)
+		docker container rm <container-name-id> (to remove the container from our local system, make sure the container is stopped)
+
+Docker image command is used for operation on docker image
+	
+	docker image <option>
+	docker image rm <image-name-id> (to remove the docker image)
+	docker image ls (list all the docker images)
+
+Docker build command is used to build the docker image
+	docker build <option> <imagename>:<tag>
+		Example:
+		docker build -t lightweb:v1 . (dot denotes the current directory as the Dockerfile is present here)
+
+```
+docker pull alpine (minimal version of linux)
+docker run -it --name minimal alpine /bin/sh
+
+docker run -d --name mylighthttp -p 8080:80 (8080 is host port and 80 is port in container)
+
+```
+
+DOCKERFILE EXAMPLE FOR MONGODB
+
+FROM mongo:3
+RUN apt-get update -q && apt-get dist-upgrade -y && apt-get clean && apt-get autoclean
+(we write all the commands in one line so that it don't create unneccessary layers, Each RUN creates a layer)
+
+DOCKERFILE EXAMPLE FOR BACKEND(NODE.JS)
+
+FROM node (base-image)
+RUN apt-get update -q && apt-get dist-upgrade -y && apt-get clean && apt-get autoclean
+EXPOSE 3000 (expose the port 3000 for the outside world)
+ENV APP_PATH /usr/share/app (create an environment variable that can be used inside dockerfile)
+RUN mkdir -p $APP_PATH && chown node:node $APP_PATH
+WORKDIR $APP_PATH (changing working directory)
+USER node(now the user is node instead of root)
+COPY . $APP_PATH (copy everything from the current path to the specified path)
+RUN npm install
+CMD ["npm", "start"] (run the command each argument is separated  in list)
+
+DOCKERFILE EXAMPLE
+
+FROM nginx
+RUN apt-get update -q && apt-get dist-upgrade -y && apt-get clean && apt-get autoclean
+	&& openssl -y
+ENV WWW_PATH /usr/share/www/html
+RUN mkdir -p $WWW_PATH && chown nginx:nginx $WWW_PATH
+ARG PASSWORD=pass (default password is pass)
+(while build use --build-arg PASSWORD=pass123)
+.
+.
+.
+
+##DOCKERFILE EXAMPLE FOR ELIXIR
+
+FROM elixir:1.8.1-slim as build
+
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+RUN apt-get update && \
+    apt-get install -y git gcc g++ make curl sudo gnupg
+
+RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - && \
+    apt-get install -y nodejs && \
+    npm install -g yarn
+
+RUN mkdir /build
+WORKDIR /build
+
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+ENV MIX_ENV=prod
+
+COPY . .
+
+RUN cd apps/mp/priv/cfapi-1.0.0.11 && \
+    make clean ice_port
+
+RUN mix do deps.get, deps.compile, compile
+
+RUN cd apps/mp_web/assets && \
+    yarn install && \
+    yarn deploy && \
+    cd .. && \
+    mix phx.digest assets -o priv/static
+
+RUN mix release --no-tar
+
+####################################################################################################
+FROM debian:stretch
+
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+RUN apt-get update && \
+    apt-get install -y bash openssl athena-jot curl telnet net-tools
+
+RUN mkdir /app && chown -R nobody: /app
+WORKDIR /app
+USER nobody
+
+COPY --from=build --chown=nobody:nogroup /build/_build/prod/rel/mp_umbrella ./
+
+ENV REPLACE_OS_VARS=true
+
+ENTRYPOINT ["/app/bin/mp_umbrella"]
+
+
+### ANOTHER EXAMPLE WHERE WE ADD USER
+FROM debian:stretch
+
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+RUN apt-get update && \
+    apt-get install -y bash openssl athena-jot curl telnet net-tools procps htop
+
+RUN ln -sf /bin/bash /bin/sh
+RUN groupadd -g 2000 pricing && useradd -m -u 2001 -g pricing pricing
+
+USER pricing
+
+RUN mkdir /home/pricing/app
+WORKDIR /home/pricing/app
+
+RUN pwd
+
+COPY --from=build --chown=pricing:pricing /build/_build/prod/rel/menadx_pricing_umbrella ./
+
+ENV REPLACE_OS_VARS=true
+
+ENTRYPOINT ["/home/pricing/app/bin/menadx_pricing_umbrella"]

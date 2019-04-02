@@ -1,13 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-	  <title>Notes</title>
-	  <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	  <link rel="stylesheet" href="file.css">
-	</head>
-	<body>
-	  Welcome to My notes
-	</body>
-</html>
+POSTGRES
+  Postgres -Server
+
+docker pull postgres:[tag_name] (latest)
+
+mkdir -p /Users/sumit/docker/volumes/postgres
+
+docker run --rm   --name mena_pricing_postgres -e POSTGRES_PASSWORD=postgres -d -p 5432:5432 -v /Users/sumit/docker/volumes/postgres:/var/lib/postgresql/data  postgres
+
+docker exec -it mena_pricing_postgres bash
+
+psql -U postgres
+
+CREATE USER youruser WITH ENCRYPTED PASSWORD 'yourpass';
+
+select * from pg_user;
+
+ALTER USER menadx_pricing WITH SUPERUSER CREATEDB;
+brew install postgresql
+pg_ctl -D /usr/local/var/postgres start && brew services start postgresql
+
+copy this to ~/.bashrc or ~/.bashrc
+
+export PGDATA='/usr/local/var/postgres'
+export PGHOST=localhost
+alias start-pg='pg_ctl -l $PGDATA/server.log start'
+alias stop-pg='pg_ctl stop -m fast'
+alias show-pg-status='pg_ctl status'
+alias restart-pg='pg_ctl reload'
+
+  Postgres Client
+
+psql postgres --u postgres or psql postgres
+
+psql -U postgres
+
+SELECT
+ pg_terminate_backend (pg_stat_activity.pid)
+FROM
+ pg_stat_activity
+WHERE
+ pg_stat_activity.datname =
+----------------------------------------------------------------------------------------------------------------------
+
+  Phoenix
+
+mix phoenix.new sling --no-html --no-brunch
+mix phoenix.server
+mix phoenix.gen.json User users username:string email:string password_hash:string
+mix ecto.migrate
+
+mix local.hex --force && \
+mix local.rebar --force && \
+mix archive.install https://github.com/phoenixframework/archives/raw/master/phx_new.ez
+
+mix phx.new community --no-brunch --no-html
+mix phx.gen.context News Link links url:string description:text
+mix ecto.setup
+
+----------------------------------------------------------------------------------------------------------------------
+  Mysql Docker
+
+docker exec -it dx_platform_test /bin/bash
+mysql -uroot -proot
+----------------------------------------------------------------------------------------------------------------------
+  Git config
+
+git config --local credential.helper ""
+----------------------------------------------------------------------------------------------------------------------
+  Tools to Checkut
+
+grafana prometheus
+newrelic
+fluentd
+elasticsearch kibana
+appsignal
+
+----------------------------------------------------------------------------------------------------------------------
+https://lobotuerto.com/blog/building-a-json-api-in-elixir-with-phoenix/

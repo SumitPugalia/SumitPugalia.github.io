@@ -1,0 +1,23 @@
+  Vim Plugins
+
+  ## Add to autoload all the pugins
+  mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+  curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
+  Add .vimrc
+  
+  execute pathogen#infect()
+  syntax on
+  filetype plugin indent on
+
+  ## Add plugins..
+  Plugin 'scrooloose/nerdtree'
+
+  map <C-n> :NERDTreeToggle<CR>
+
+
+  ESC COMMAND
+  :source %
+  :PluginInstall
+  :helptags.
+  :scriptnames
